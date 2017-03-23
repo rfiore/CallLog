@@ -1,59 +1,115 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
-import React, { Component } from 'react';
+import React from 'react';
 import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  NativeModules,
-  View
+	AppRegistry,
+	AsyncStorage,
 } from 'react-native';
+import {
+	NavigationActions,
+	addNavigationHelpers,
+	StackNavigator,
+} from 'react-navigation';
+import {
+	Provider,
+	connect,
+} from 'react-redux';
+import {
+	createStore,
+	combineReducers,
+	applyMiddleware,
+	compose
+} from 'redux';
+import {
+	persistStore,
+	autoRehydrate,
+} from 'redux-persist';
 
-var callLogList  = NativeModules.CallLogList;
+import thunkMiddleware from 'redux-thunk'
+import createLogger from 'redux-logger'
 
-export default class CallLog extends Component {
-  render() {
+import { meetings, settings, appState} from './app/reducers/index'
 
-    var test = callLogList.testCall((msg) => { console.log(msg) });
+import SettingsScreen from './app/components/Settings'
+import MainScreen from './app/components/Main'
+import MeetingScreen from './app/components/Meeting'
+import CreateMeetingScreen from './app/components/CreateMeeting'
+import ExportScreen from './app/components/Export'
 
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu test
-        </Text>
-      </View>
-    );
-  }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+const AppNavigator = StackNavigator({
+	Settings: 			{ screen: SettingsScreen },
+	Main: 					{ screen: MainScreen },
+	Meeting: 				{ screen: MeetingScreen },
+	CreateMeeting: 	{ screen: CreateMeetingScreen },
+	Export: 				{ screen: ExportScreen },
 });
 
-AppRegistry.registerComponent('CallLog', () => CallLog);
+// TO DO: Create container with this component
+const AppWithNavigationState = connect(state => ({
+	nav: state.nav,
+}))(({ dispatch, nav }) => (
+	<AppNavigator navigation={addNavigationHelpers({ dispatch, state: nav })} />
+));
+
+const initialNavState = {
+	index: 0,
+	routes: [
+		{ key: 'InitA', routeName: 'Main' }
+	],
+};
+
+const nav = (state = initialNavState, action) => {
+	var state = Object.assign({}, state);
+
+	switch (action.type) {
+		case 'ADD_MEETING':
+			return AppNavigator.router.getStateForAction(NavigationActions.navigate({ routeName: 'Main' }), state);
+
+		case 'SAVE_SETTINGS':
+			return AppNavigator.router.getStateForAction(NavigationActions.navigate({ routeName: 'Main' }), state);
+
+		case 'STOP_MEETING':
+			return AppNavigator.router.getStateForAction(NavigationActions.navigate({ routeName: 'Main' }), state);
+
+		case 'SAVE_MEETING':
+			return AppNavigator.router.getStateForAction(NavigationActions.navigate({ routeName: 'Main' }), state);
+
+		default:
+			return AppNavigator.router.getStateForAction(action, state);
+	}
+}
+
+const AppReducer = combineReducers({
+	appState,
+	meetings,
+	settings,
+	nav,
+});
+
+const loggerMiddleware = createLogger({ predicate: (getState, action) => __DEV__  });
+
+function configureStore() {
+	const enhancer = compose(
+		applyMiddleware(
+			thunkMiddleware,
+			loggerMiddleware,
+		),
+		autoRehydrate()
+	);
+	return createStore(AppReducer, undefined, enhancer);
+}
+
+const store = configureStore();
+persistStore(store, { storage: AsyncStorage }); //.purge();
+
+
+class App extends React.Component {
+	render() {
+		return (
+			<Provider store={store}>
+				<AppWithNavigationState />
+			</Provider>
+		);
+	}
+}
+
+AppRegistry.registerComponent('CallLog', () => App);
+

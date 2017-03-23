@@ -13,7 +13,8 @@ import com.facebook.soloader.SoLoader;
 import java.util.Arrays;
 import java.util.List;
 
-import com.callLogListModule.CallLogListPackage;
+import com.chirag.RNMail.*;
+import com.rnfs.RNFSPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -27,7 +28,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-          new CallLogListPackage()
+          new RNMail(),
+          new RNFSPackage()
       );
     }
   };
