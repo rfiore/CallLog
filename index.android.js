@@ -23,16 +23,23 @@ import {
 	autoRehydrate,
 } from 'redux-persist';
 
+
+// module.exports = NativeModules.PhonecallReceiver
+
+
 import thunkMiddleware from 'redux-thunk'
 import createLogger from 'redux-logger'
 
-import { meetings, settings, appState} from './app/reducers/index'
+import { meetings, meetingsById, settings, appState} from './app/reducers/index'
 
 import SettingsScreen from './app/components/Settings'
 import MainScreen from './app/components/Main'
 import MeetingScreen from './app/components/Meeting'
 import CreateMeetingScreen from './app/components/CreateMeeting'
 import ExportScreen from './app/components/Export'
+import AddContactScreen from './app/components/AddContact'
+import ContactScreen from './app/components/Contact'
+import SearchScreen from './app/components/Search'
 
 const AppNavigator = StackNavigator({
 	Settings: 			{ screen: SettingsScreen },
@@ -40,6 +47,9 @@ const AppNavigator = StackNavigator({
 	Meeting: 				{ screen: MeetingScreen },
 	CreateMeeting: 	{ screen: CreateMeetingScreen },
 	Export: 				{ screen: ExportScreen },
+	AddContact: 		{ screen: AddContactScreen },
+	Contact: 				{ screen: ContactScreen },
+	Search: 				{ screen: SearchScreen },
 });
 
 // TO DO: Create container with this component
@@ -60,17 +70,15 @@ const nav = (state = initialNavState, action) => {
 	var state = Object.assign({}, state);
 
 	switch (action.type) {
-		case 'ADD_MEETING':
-			return AppNavigator.router.getStateForAction(NavigationActions.navigate({ routeName: 'Main' }), state);
 
 		case 'SAVE_SETTINGS':
-			return AppNavigator.router.getStateForAction(NavigationActions.navigate({ routeName: 'Main' }), state);
-
+		case 'ADD_MEETING':
 		case 'STOP_MEETING':
+		case 'SET_DATES':
 			return AppNavigator.router.getStateForAction(NavigationActions.navigate({ routeName: 'Main' }), state);
 
-		case 'SAVE_MEETING':
-			return AppNavigator.router.getStateForAction(NavigationActions.navigate({ routeName: 'Main' }), state);
+		case 'ADD_CONTACT':
+			return AppNavigator.router.getStateForAction(NavigationActions.back(), state);
 
 		default:
 			return AppNavigator.router.getStateForAction(action, state);
@@ -80,6 +88,7 @@ const nav = (state = initialNavState, action) => {
 const AppReducer = combineReducers({
 	appState,
 	meetings,
+	meetingsById,
 	settings,
 	nav,
 });
@@ -98,7 +107,7 @@ function configureStore() {
 }
 
 const store = configureStore();
-persistStore(store, { storage: AsyncStorage }); //.purge();
+persistStore(store, { storage: AsyncStorage }) //.purge();
 
 
 class App extends React.Component {

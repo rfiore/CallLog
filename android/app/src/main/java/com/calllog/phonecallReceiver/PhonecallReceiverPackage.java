@@ -1,4 +1,4 @@
-package com.callLogListModule;
+package com.phonecallReceiver;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CallLogListPackage implements ReactPackage {
+public class PhonecallReceiverPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new CallLogListModule(reactContext)); // adding the module to package
+        modules.add(new PhonecallReceiverModule(reactContext)); // adding the module to package
         return modules;
     }
     @Override

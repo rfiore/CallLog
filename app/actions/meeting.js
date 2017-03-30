@@ -19,6 +19,17 @@ export function addMeeting(data) {
 	}
 }
 
+export function addCall(data) {
+	return {
+		type: types.ADD_CALL,
+		id: data.id,
+		name: data.name,
+		subject: data.subject,
+		rate: data.rate,
+		startAt: data.startAt
+	}
+}
+
 export function updateMeeting(data) {
 	return {
 		type: types.UPDATE_MEETING,
@@ -37,6 +48,7 @@ export function stopMeeting(data) {
 export function saveMeeting(data) {
 	return {
 		type: types.SAVE_MEETING,
+		payload: { id: data.id, name: data.name, subject: data.subject, rate: data.rate },
 		id: data.id,
 		name: data.name,
 		subject: data.subject,
@@ -47,5 +59,21 @@ export function saveMeeting(data) {
 export function clearMeetings() {
 	return {
 		type: types.CLEAR_MEETINGS
+	}
+}
+
+export function addContact(data) {
+	return {
+		type: types.ADD_CONTACT,
+		id: data.id,
+		contact: data.contact
+	}
+}
+
+export function setDates(data) {
+	return {
+		type: types.SET_DATES,
+		startDate: data.startDate,
+		endDate: data.endDate
 	}
 }

@@ -11,6 +11,15 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Row from './Row';
 import SectionHeader from './SectionHeader';
 
+import Dates from 'react-native-dates';
+import moment from 'moment';
+
+import TimerMixin from 'react-timer-mixin';
+
+import { NativeModules } from 'react-native';
+
+//import CallLogList from 'CallLogList'
+
 import {
 	Button,
 	Text,
@@ -74,6 +83,7 @@ class MainScreen extends Component {
 
 		if (this.props.isRunning !== nextProps.isRunning) {
 			if (nextProps.isRunning == true) {
+				console.log('run');
 				this.runTimer();
 			} else {
 				clearInterval(this.state.timer);
@@ -153,27 +163,47 @@ class MainScreen extends Component {
 
 	render() {
 
+		//NativeModules.PhonecallReceiver.testCall((uri) => { console.log(uri) });
+
 		const navigate = this.props.navigation;
 		
 		return (
 			<View style={styles.container}>
-				<View style={styles.buttonContainer}>
-					<TouchableOpacity disabled={ this.props.isRunning } onPress={() => navigate.dispatch(NavigationActions.navigate({ routeName: 'CreateMeeting' }))}>
-						<Icon name="ios-add-circle" size={30} color="#4F8EF7" />
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => navigate.dispatch(NavigationActions.navigate({ routeName: 'Export' }))}>
-						<Icon name="ios-download" size={30} color="#4F8EF7" />
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => navigate.dispatch(NavigationActions.navigate({ routeName: 'Settings' }))}>
-						<Icon name="ios-settings" size={30} color="#4F8EF7" />
-					</TouchableOpacity>
+				<View style={styles.header}>
+					<View style={styles.titleContainer}>
+						<Text style={styles.welcome}>Call Log</Text>
+					</View>
+					<View style={styles.buttonContainer}>
+						<TouchableOpacity disabled={ this.props.isRunning } onPress={() => navigate.dispatch(NavigationActions.navigate({ routeName: 'CreateMeeting' }))}>
+							<Icon name="ios-add-circle-outline" size={28} color="#4F8EF7" />
+						</TouchableOpacity>
+						<TouchableOpacity onPress={() => navigate.dispatch(NavigationActions.navigate({ routeName: 'Search' }))}>
+							<Icon name="ios-calendar-outline" size={28} color="#4F8EF7" />
+						</TouchableOpacity>
+						<TouchableOpacity onPress={() => navigate.dispatch(NavigationActions.navigate({ routeName: 'Export' }))}>
+							<Icon name="ios-download-outline" size={28} color="#4F8EF7" />
+						</TouchableOpacity>
+						<TouchableOpacity onPress={() => navigate.dispatch(NavigationActions.navigate({ routeName: 'Settings' }))}>
+							<Icon name="ios-settings-outline" size={28} color="#4F8EF7" />
+						</TouchableOpacity>
+					</View>
 				</View>
 				<View style={styles.searchContainer}>
+					<Icon style={styles.searchIcon} name="ios-search-outline" size={28} />
 					<TextInput
-						style={styles.input}
-						onChangeText={(text) => console.log( this.searchMeeting(this.props.meetings, text) )}
+						style={styles.searchInput}
+						onChangeText={(text) => this.searchMeeting(this.props.meetings, text)}
+						placeholder='Search...'
 					/>
 				</View>
+
+				{this.props.startDate &&
+					<View style={styles.searchContainer}>
+						<Icon style={styles.searchIcon} name="ios-calendar-outline" size={28} />
+						<Text style={styles.searchText}>{moment(this.props.startDate).format('YYYY/MM/DD')}  ›  {moment(this.props.endDate).format('YYYY/MM/DD')}</Text>
+					</View>
+				}
+
 				<View style={styles.listContainer}>
 					<ListView
 						style={styles.container}
@@ -191,9 +221,18 @@ class MainScreen extends Component {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#F5FCFF',
+		backgroundColor: '#FFFFFF',
+	},
+	header: {
+		flexDirection: 'row',
+		height: 50,
+	},
+	titleContainer: {
+		flex: 1,
+		height: 50,
 	},
 	buttonContainer: {
+		flex: 1,
 		height: 50,
 		flexDirection: 'row',
 		justifyContent: 'space-around',
@@ -201,18 +240,40 @@ const styles = StyleSheet.create({
 	},
 	searchContainer: {
 		height: 50,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-around',
+		marginLeft: 10,
+		marginRight: 10,
+	},
+	searchIcon: {
+		marginLeft: 4,
+		marginTop: 12,
+		height: 36,
+		width: 36,
+	},
+	searchInput: {
+		flex: 1,
+		height: 50,
+		fontSize: 16,
+		fontFamily: 'Poppins-Regular',
+	},
+	searchText: {
+		flex: 1,
+		marginTop: 4,
+		marginLeft: 4,
+		fontSize: 14,
+		fontFamily: 'Poppins-Regular',
 	},
 	listContainer: {
 		flex: 1
 	},
-	input: {
-		height: 40,
-		fontSize: 16
-	},
 	welcome: {
 		fontSize: 20,
-		textAlign: 'center',
-		margin: 10,
+		marginTop: 10,
+		marginLeft: 10,
+		fontFamily: 'Poppins-Light',
+		color: '#4F8EF7'
 	},
 	instructions: {
 		textAlign: 'center',
@@ -228,10 +289,16 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state) {
 
+	const meetingArr = state.meetingsById.map((item, index) => {
+	   return state.meetings[item]
+	});
+
 	return {
-		meetings: state.meetings,
+		meetings: meetingArr,
 		isRunning: state.appState.isRunning,
-		id: state.appState.currentMeeting
+		id: state.appState.currentMeeting,
+		startDate: state.appState.startDate,
+		endDate: state.appState.endDate,
 	};
 }
 

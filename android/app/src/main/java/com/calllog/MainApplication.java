@@ -15,6 +15,9 @@ import java.util.List;
 
 import com.chirag.RNMail.*;
 import com.rnfs.RNFSPackage;
+import com.rt2zz.reactnativecontacts.ReactNativeContacts;
+import com.phonecallReceiver.PhonecallReceiverPackage;
+
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -29,7 +32,9 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
           new RNMail(),
-          new RNFSPackage()
+          new RNFSPackage(),
+          new ReactNativeContacts(),
+          new PhonecallReceiverPackage()
       );
     }
   };

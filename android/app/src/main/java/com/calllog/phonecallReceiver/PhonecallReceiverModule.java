@@ -1,4 +1,4 @@
-package com.callLogListModule;
+package com.phonecallReceiver;
 
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -21,38 +21,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class CallLogListModule extends ReactContextBaseJavaModule implements LoaderManager.LoaderCallbacks<Cursor> {
+public class PhonecallReceiverModule extends ReactContextBaseJavaModule {
 
-  public CallLogListModule(ReactApplicationContext reactContext) {
+  public PhonecallReceiverModule(ReactApplicationContext reactContext) {
 	super(reactContext);
   }
 
 	@Override
 	public String getName() {
-		return "CallLogList";
+		return "PhonecallReceiver";
 	}
 
-	@Override
-    public Loader<Cursor> onCreateLoader(int loaderID, Bundle args) {
-    	return null;
-    }
-
-	@Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor managedCursor) {
-
-    }
-
-	@Override
-	public void onLoaderReset(Loader<Cursor> loader) {
-
-	}
-
-   @ReactMethod
+  @ReactMethod
 	public void testCall(Callback callback) {
 		try{
-
-
-
 			callback.invoke("yo");
 		}catch(Exception e){  
 

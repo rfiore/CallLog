@@ -4,13 +4,21 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
 import { ActionCreators } from '../actions'
 
+import { NavigationActions } from 'react-navigation';
+
+import moment from 'moment';
+
+import { onlyNumbers } from '../utils/utils';
+
+
 import {
 	Button,
 	Text,
 	View,
 	ScrollView,
 	StyleSheet,
-	TextInput
+	TextInput,
+	TouchableOpacity
 } from 'react-native';
 
 
@@ -21,20 +29,27 @@ class MeetingScreen extends Component {
 
 		this.stopMeeting = this.stopMeeting.bind(this);
 		this.saveMeeting = this.saveMeeting.bind(this);
+		this.viewContact = this.viewContact.bind(this);
+
+		const params = this.props.navigation.state.params;
 
 		this.state = {
-			id: this.props.navigation.state.params.id,
-			name: this.props.navigation.state.params.name,
-			subject: this.props.navigation.state.params.subject,
+			type: 					params.type,
+			id: 						params.id,
+			name: 					params.name,
+			subject: 				params.subject,
 			rate: 100,
-			isOver: this.props.navigation.state.params.isOver
+			isOver: 				params.isOver,
+			startAt: 				params.startAt,
+			endAt: 					params.endAt,
+			contacts: []
 		}
 	}
 
 	static navigationOptions = {
 		title: (navigation, childRouter) => {
 			return navigation.state.params.name;
-		},
+		}
 	};
 
 	stopMeeting() {
@@ -44,6 +59,7 @@ class MeetingScreen extends Component {
 	}
 
 	saveMeeting() {
+		console.log('meetings', this.props.meetings)
 		this.props.saveMeeting({
 			id: this.state.id,
 			name: this.state.name,
@@ -52,57 +68,102 @@ class MeetingScreen extends Component {
 		});
 	}
 
+	viewContact(contact) {
+		this.props.navigation.dispatch(NavigationActions.navigate({ routeName: 'Contact', params: { contact: contact }}));
+	}
+
+	componentWillReceiveProps(nextProps) {
+		console.log(this.props.meetings, nextProps.meetings)
+		if (this.props.meetings !== nextProps.meetings.byHash) {
+			this.setState({
+				endAt: nextProps.meetings[this.state.id].endAt,
+				isOver: nextProps.meetings[this.state.id].isOver,
+				contacts: nextProps.meetings[this.state.id].contacts,
+			})
+		}
+	}
+
 	render() {
 
-		var date1 = new Date(this.props.navigation.state.params.startAt);
-		var date2 = new Date(this.props.navigation.state.params.endAt);
+		const navigate = this.props.navigation;
+
+		var date1 = new Date(this.state.startAt);
+		var date2 = new Date(this.state.endAt);
 		var timeDiff = Math.abs(date2.getTime() - date1.getTime());
 		var minutes = Math.floor(timeDiff / 60000);
   	var seconds = ((timeDiff % 60000) / 1000).toFixed(0);
+  	var cost = (moment.duration(timeDiff).asHours() * this.state.rate).toFixed(2)
 
+  	var self = this;
+		
+		var contactsList = this.state.contacts.map(function(contact, index) {
+						return <TouchableOpacity key={index} onPress={() => self.viewContact(contact)} style={styles.settingTouch}>
+										<Text style={styles.settingTouchText}>{contact.givenName} {contact.familyName}</Text>
+									</TouchableOpacity>
+					});
 
 		return (
 			<ScrollView style={styles.container}>
 
-				<View style={styles.label}>
-					<Text style={styles.labelText}>Name</Text>
-				</View>
+				{ /* Name */ }
+				<Text style={styles.settingLabel}>NAME</Text>
 				<TextInput
-					style={styles.input}
+					style={styles.settingInput}
 					onChangeText={(text) => this.setState({name: text})}
 					value={this.state.name}
 				/>
 
-				<View style={styles.label}>
-					<Text style={styles.labelText}>Subject</Text>
-				</View>
+				{ /* Subject */ }
+				<Text style={styles.settingLabel}>SUBJECT</Text>
 				<TextInput
-					style={styles.input}
+					style={styles.settingInput}
 					onChangeText={(text) => this.setState({subject: text})}
 					value={this.state.subject}
 				/>
 
-				<View style={styles.label}>
-					<Text style={styles.labelText}>Rate</Text>
-				</View>
+				{ /* Rate */ }
+				<Text style={styles.settingLabel}>RATE PER HOUR</Text>
 				<TextInput
-					style={styles.input}
-					onChangeText={(text) => this.setState({rate: text})}
+					style={styles.settingInput}
+					keyboardType = 'numeric'
+					onChangeText={(text) => onlyNumbers(this, 'rate', text)}
 					value={(this.state.rate).toString()}
 				/>
 
-				<View style={styles.label}>
-					<Text style={styles.labelText}>Start at:{'\n'}{date1.toString()}</Text>
+				{ /* Type */ }
+				<Text style={styles.settingLabel}>TYPE</Text>
+				<Text style={styles.settingText}>{this.state.type}</Text>
+
+				{ /* Start at */ }
+				<Text style={styles.settingLabel}>STARTED</Text>
+				<Text style={styles.settingText}>{moment(date1).format('MMMM Do YYYY, h:mm:ss a')}</Text>
+				
+
+				{ /* End at */ }
+				<Text style={styles.settingLabel}>ENDED</Text>
+				<Text style={styles.settingText}>{moment(date2).format('MMMM Do YYYY, h:mm:ss a')}</Text>
+
+				{ /* Duration */ }
+				<Text style={styles.settingLabel}>DURATION</Text>
+				<Text style={styles.settingText}>{minutes} min {seconds} sec</Text>
+
+				{ /* Cost */ }
+				<Text style={styles.settingLabel}>COST</Text>
+				<Text style={styles.settingText}>{cost} €</Text>
+
+				{ /* Contacts */ }
+				<Text style={styles.settingLabel}>PARTICIPANTS</Text>
+				{contactsList}
+
+				{ /* Add contact */ }
+				<View style={styles.button}>
+					<Button
+						title='Add contact'
+						onPress={() => navigate.dispatch(NavigationActions.navigate({ routeName: 'AddContact', params: {id: this.state.id} }))}
+					/>
 				</View>
 
-				<View style={styles.label}>
-					<Text style={styles.labelText}>End at:{'\n'}{date2.toString()}</Text>
-				</View>
-
-				<View style={styles.label}>
-					<Text style={styles.labelText}>Duration:{'\n'}{minutes} min {seconds} sec</Text>
-				</View>
-
+				{ /* Stop meeting */ }
 				{this.state.isOver == false &&
 					<View style={styles.button}>
 						<Button
@@ -112,7 +173,9 @@ class MeetingScreen extends Component {
 						/>
 					</View>
 				}
-				<View style={styles.button}>
+
+				{ /* Save meeting */ }
+				<View style={styles.buttonLast}>
 					<Button
 						title='Save meeting'
 						onPress={this.saveMeeting}
@@ -128,16 +191,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: 20,
-		backgroundColor: '#F5FCFF',
-	},
-	label: {
-		height: 40,
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: 10,
-	},
-	labelText: {
-		fontSize: 15,
+		backgroundColor: '#FFFFFF',
 	},
 	input: {
 		height: 40,
@@ -146,15 +200,40 @@ const styles = StyleSheet.create({
 	button: {
 		marginBottom: 10,
 	},
-	welcome: {
-		fontSize: 20,
-		textAlign: 'center',
-		margin: 10,
+	buttonLast: {
+		marginBottom: 60,
 	},
-	instructions: {
-		textAlign: 'center',
-		color: '#333333',
-		marginBottom: 5,
+	settingLabel: {
+		fontSize: 12,
+		fontFamily: 'Poppins-Medium',
+		color: '#4F8EF7',
+		height: 20,
+		marginLeft: 4
+	},
+	settingInput: {
+		height: 40,
+		fontSize: 15,
+		fontFamily: 'Poppins-Regular',
+		marginBottom: 16,
+		color: '#777777'
+	},
+	settingText: {
+		height: 40,
+		fontSize: 15,
+		fontFamily: 'Poppins-Regular',
+		marginBottom: 4,
+		marginLeft: 4
+	},
+	settingTouch: {
+		flex: 1,
+		padding: 12,
+		borderBottomWidth: 1,
+		borderBottomColor: '#EEEEEE',
+	},
+	settingTouchText: {
+		fontSize: 15,
+		fontFamily: 'Poppins-Regular',
+		color: '#4F8EF7',
 	},
 });
 
@@ -163,9 +242,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state) {
+	console.log('mapStateToProps', state.meetings)
 	return {
-		state: state,
-		isRunning: state.meetings.isRunning,
+		meetings: state.meetings,
+		isRunning: state.appState.isRunning,
 	};
 }
 

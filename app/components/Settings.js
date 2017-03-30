@@ -4,6 +4,8 @@ import { bindActionCreators } from 'redux'
 import { ActionCreators } from '../actions'
 import Icon from 'react-native-vector-icons/Ionicons';
 
+import { onlyNumbers } from '../utils/utils';
+
 import {
 	Button,
 	Text,
@@ -38,19 +40,17 @@ class SettingsScreen extends Component {
 		
 		return (
 			<View style={styles.container}>
-				<View style={styles.label}>
-					<Text style={styles.labelText}>Rate</Text>
-				</View>
+
+				{ /* Rate */ }
+				<Text style={styles.settingLabel}>RATE PER HOUR</Text>
 				<TextInput
-					style={styles.input}
-					onChangeText={(text) => this.setState({rate: text})}
-					value={(this.state.rate).toString()}
+					style={styles.settingInput}
+					keyboardType = 'numeric'
+					onChangeText={(text) => onlyNumbers(this, 'rate', text)}
+					value={this.state.rate}
 				/>
-				<TextInput
-					style={styles.input}
-					onChangeText={(text) => this.setState({rate: text})}
-					value={(this.state.rate).toString()}
-				/>
+
+			{ /* Save setting */ }
 				<Button
 					title='save'
 					onPress={this.saveSettings}
@@ -64,31 +64,20 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: 20,
-		backgroundColor: '#F5FCFF',
+		backgroundColor: '#FFFFFF',
 	},
-	label: {
+	settingLabel: {
+		fontSize: 12,
+		fontFamily: 'Poppins-Medium',
+		color: '#4F8EF7',
+		height: 20,
+		marginLeft: 4
+	},
+	settingInput: {
 		height: 40,
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	labelText: {
-		fontSize: 16,
-		marginLeft: 10,
-	},
-	input: {
-		height: 40,
-		marginBottom: 10,
-		fontSize: 16
-	},
-	welcome: {
-		fontSize: 20,
-		textAlign: 'center',
-		margin: 10,
-	},
-	instructions: {
-		textAlign: 'center',
-		color: '#333333',
-		marginBottom: 5,
+		fontSize: 15,
+		fontFamily: 'Poppins-Regular',
+		marginBottom: 16,
 	},
 });
 

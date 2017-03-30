@@ -10,11 +10,14 @@
     "json2csv": "^3.7.3",
     "react": "^15.4.2",
     "react-native": "0.41.2",
+    "react-native-contacts": "^0.8.0",
+    "react-native-dates": "git+https://github.com/rfiore/react-native-dates.git",
     "react-native-fs": "^2.1.0-rc.1",
-    "react-native-mail": "^3.0.1",
+    "react-native-mail": "git+https://github.com/ujwal-setlur/react-native-mail.git",
     "react-native-vector-icons": "^4.0.0",
     "react-navigation": "^1.0.0-beta.7",
     "react-redux": "^5.0.3",
+    "react-timer-mixin": "^0.13.3",
     "redux": "^3.6.0",
     "redux-logger": "^2.8.2",
     "redux-persist": "^4.4.2",
@@ -28,5 +31,10 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "rnpm": {
+    "assets": [
+      "app/assets/fonts"
+    ]
   }
 }

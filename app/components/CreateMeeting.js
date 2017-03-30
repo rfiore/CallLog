@@ -4,6 +4,14 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
 import { ActionCreators } from '../actions'
 
+import { NavigationActions } from 'react-navigation';
+
+import { phonecall } from 'react-native-communications';
+
+import moment from 'moment';
+
+import { onlyNumbers } from '../utils/utils';
+
 import {
 	Button,
 	Text,
@@ -19,12 +27,14 @@ class CreateMeetingScreen extends Component {
 		super(props);
 
 		this.addMeeting = this.addMeeting.bind(this);
+		this.addCall = this.addCall.bind(this);
+
 
 		this.state = {
-			id: this.props.id,
 			name: '',
 			subject: '',
-			rate: 100,
+			rate: this.props.settings.rate,
+			number: false
 		}
 	}
 
@@ -33,52 +43,109 @@ class CreateMeetingScreen extends Component {
 	};
 
 	addMeeting() {
+
+		//var meetingId = this.props.meetings.length;
+
+		var meetingId = moment().format();
+
 		this.props.addMeeting({
-			id: this.state.id,
+			id: meetingId,
 			name: this.state.name,
 			subject: this.state.subject,
 			rate: this.state.rate,
 			startAt: (new Date()).toJSON()
 		});
+
+/*		this.props.navigation.dispatch(NavigationActions.navigate({ routeName: 'Meeting', params: {
+			id: meetingId,
+			name: this.state.name,
+			subject: this.state.subject,
+			rate: this.state.rate,
+			startAt: (new Date()).toJSON(),
+			endAt: (new Date()).toJSON()
+		}}));*/
+	}
+
+	addCall() {
+
+		var meetingId = this.props.meetings.length;
+
+		if(this.state.number) {
+			this.props.addCall({
+				id: meetingId,
+				name: this.state.name,
+				subject: this.state.subject,
+				rate: this.state.rate,
+				startAt: (new Date()).toJSON(),
+				number: false
+			});
+
+			phonecall(this.state.number, true)
+
+/*			this.props.navigation.dispatch(NavigationActions.navigate({ routeName: 'Meeting', params: {
+				id: meetingId,
+				name: this.state.name,
+				subject: this.state.subject,
+				rate: this.state.rate,
+				startAt: (new Date()).toJSON(),
+				endAt: (new Date()).toJSON()
+			}}));*/
+		}
 	}
 
 	render() {
+
+		const navigate = this.props.navigation;
+
 		var now = (new Date()).toJSON();
 
 		return (
 			<View style={styles.container}>
 
-				<View style={styles.label}>
-					<Text style={styles.labelText}>Name</Text>
-				</View>
+				<Text style={styles.settingLabel}>NAME</Text>
 				<TextInput
-					style={styles.input}
+					style={styles.settingInput}
 					onChangeText={(text) => this.setState({name: text})}
 					value={this.state.name}
 				/>
 
-				<View style={styles.label}>
-					<Text style={styles.labelText}>Subject</Text>
-				</View>
+				<Text style={styles.settingLabel}>SUBJECT</Text>
 				<TextInput
-					style={styles.input}
+					style={styles.settingInput}
 					onChangeText={(text) => this.setState({subject: text})}
 					value={this.state.subject}
 				/>
 
-				<View style={styles.label}>
-					<Text style={styles.labelText}>Rate</Text>
-				</View>
+				<Text style={styles.settingLabel}>RATE PER HOUR</Text>
 				<TextInput
-					style={styles.input}
-					onChangeText={(text) => this.setState({rate: text})}
+					style={styles.settingInput}
+					keyboardType = 'numeric'
+					onChangeText={(text) => onlyNumbers(this, 'rate', text)}
 					value={(this.state.rate).toString()}
 				/>
 
-				<Button
-					title='Start meeting'
-					onPress={this.addMeeting}
+				<Text style={styles.settingLabel}>PHONE NUMBER</Text>
+				<TextInput
+					style={styles.settingInput}
+					keyboardType = 'numeric'
+					onChangeText={(text) => onlyNumbers(this, 'number', text)}
+					value = {(this.state.number).toString()}
 				/>
+
+				<View style={styles.button}>
+					<Button
+						title='Start meeting'
+						onPress={this.addMeeting}
+					/>
+				</View>
+
+				<View style={styles.buttonLast}>
+					<Button
+						disabled={ this.state.number ? false : true }
+						title='Start call'
+						onPress={this.addCall}
+					/>
+				</View>
 			</View>
 		);
 	}
@@ -88,31 +155,26 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		padding: 20,
-		backgroundColor: '#F5FCFF',
+		backgroundColor: '#FFFFFF',
 	},
-	label: {
-		height: 40,
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	labelText: {
-		fontSize: 16,
-		marginLeft: 10,
-	},
-	input: {
-		height: 40,
+	button: {
 		marginBottom: 10,
-		fontSize: 16
 	},
-	welcome: {
-		fontSize: 20,
-		textAlign: 'center',
-		margin: 10,
+	buttonLast: {
+		marginBottom: 60,
 	},
-	instructions: {
-		textAlign: 'center',
-		color: '#333333',
-		marginBottom: 5,
+	settingLabel: {
+		fontSize: 12,
+		fontFamily: 'Poppins-Medium',
+		color: '#4F8EF7',
+		height: 20,
+		marginLeft: 4
+	},
+	settingInput: {
+		height: 40,
+		fontSize: 15,
+		fontFamily: 'Poppins-Regular',
+		marginBottom: 16,
 	},
 });
 
@@ -121,8 +183,14 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state) {
+
+	const meetingArr = state.meetingsById.map((item, index) => {
+	   return state.meetings[item]
+	});
+
 	return {
-		id: state.meetings.length
+		meetings: meetingArr,
+		settings: state.settings
 	};
 }
 

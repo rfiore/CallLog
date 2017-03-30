@@ -8,8 +8,8 @@ import {
 } from 'react-native';
 
 import { NavigationActions } from 'react-navigation';
-
 import Icon from 'react-native-vector-icons/Ionicons';
+import moment from 'moment';
 
 export default class Row extends Component {
 
@@ -31,7 +31,7 @@ export default class Row extends Component {
 		if(this.props.type === 'call') {
 			meetingIcon = (<Icon name="ios-call" size={30} color="#4F8EF7" />);
 		} else {
-			meetingIcon = (<Icon name="ios-people" size={30} color="#4F8EF7" />);
+			meetingIcon = (<Icon name="ios-person" size={30} color="#4F8EF7" />);
 		}
 
 		var date1 = new Date(this.props.startAt);
@@ -39,6 +39,7 @@ export default class Row extends Component {
 		var timeDiff = Math.abs(date2.getTime() - date1.getTime());
 		var minutes = Math.floor(timeDiff / 60000);
   	var seconds = ((timeDiff % 60000) / 1000).toFixed(0);
+  	var cost = (moment.duration(timeDiff).asHours() * this.props.rate).toFixed(2)
 
   	//return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 
@@ -56,7 +57,7 @@ export default class Row extends Component {
 							{this.props.subject}
 						</Text>
 						<Text style={styles.info}>
-							<Text style={styles.label}>DURATION:</Text> {minutes} min {seconds} sec<Text style={styles.label}>   |   RATE:</Text> {this.props.rate} €
+							<Text style={styles.label}>DURATION:</Text> {minutes} min {seconds} sec<Text style={styles.label}>   |   COST:</Text> {cost} €
 						</Text>
 					</View>
 				</TouchableOpacity>
@@ -68,7 +69,9 @@ export default class Row extends Component {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		padding: 12
+		padding: 12,
+		borderBottomWidth: 1,
+		borderBottomColor: '#EEEEEE',
 	},
 	containerRunning: {
 		flex: 1,
@@ -77,18 +80,19 @@ const styles = StyleSheet.create({
 	},
 	heading: {
 		fontSize: 18,
-		fontWeight: 'bold'
+		fontFamily: 'Poppins-Regular',
+		color: '#4F8EF7'
 	},
 	text: {
-		fontSize: 16,
+		fontSize: 15,
+		fontFamily: 'Poppins-Regular'
 	},
 	info: {
 		marginTop: 6,
-		fontWeight: 'bold',
-		fontSize: 13
+		fontSize: 12,
+		fontFamily: 'Poppins-Medium'
 	},
 	label: {
-		fontWeight: 'normal',
 		color: '#4F8EF7'
 	}
 });
