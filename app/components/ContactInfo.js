@@ -6,52 +6,94 @@ import { ActionCreators } from '../actions'
 
 import {
 	Text,
+	TextInput,
 	View,
 	StyleSheet
 } from 'react-native';
 
-class ContactScreen extends Component {
+export default class Contact extends Component {
 
 	constructor(props) {
 		super(props);
+
+		this.state = {
+			givenName: "",
+			familyName: "",
+			company: "",
+			department: "",
+			emailAddresses: [],
+			phoneNumbers: [],
+			postalAddresses: []
+		};
 	}
 
-	static navigationOptions = {
-		title: (navigation, childRouter) => {
-			return navigation.state.params.name;
-		},
-	};
+	componentWillReceiveProps(nextProps) {
+		if(this.props.contactData !== nextProps.contactData){
+			this.setState({
+				givenName: nextProps.contactData.givenName,
+				familyName: nextProps.contactData.familyName,
+			});
+		}
+	}
 
 	render() {
-		console.log(this.props.navigation.state.params.contact);
-		var contactData = this.props.navigation.state.params.contact
 
-		var emailList = contactData.emailAddresses.map(function(item, index) {
+		var self = this;
+
+		var emailList = this.state.emailAddresses.map(function(item, index) {
 						return <View key={index} style={styles.settingTouch}><Text style={styles.settingTouchText}>{item.email}{'\n'}</Text></View>
 					});
 
-		var phonelList = contactData.phoneNumbers.map(function(item, index) {
+		var phonelList = this.state.phoneNumbers.map(function(item, index) {
 						return <View key={index} style={styles.settingTouch}><Text style={styles.settingTouchText}>{item.number}{'\n'}</Text></View>
 					});
 
-		var addresslList = contactData.postalAddresses.map(function(item, index) {
+		var addresslList = this.state.postalAddresses.map(function(item, index) {
 						return <View key={index} style={styles.settingTouch}><Text style={styles.settingTouchText}>{item.formattedAddress}{'\n'}</Text></View>
 					});
+
+		var contactName = "";
+		contactName += this.state.givenName + ' ';
+		contactName += this.state.familyName + ' ';
 		
 
 		return (
 			<View style={styles.container}>
 				<Text style={styles.heading}>
-					{contactData.givenName} {contactData.familyName}
+					{contactName} 
 				</Text>
+
+				{ /* Given name */ }
+				<Text style={styles.settingLabel}>GIVEN NAME</Text>
+				<TextInput
+					style={styles.settingInput}
+					onChangeText={(text) => this.setState({givenName: text})}
+					value={this.state.givenName}
+				/>
+
+				{ /* Family name */ }
+				<Text style={styles.settingLabel}>FAMILY NAME</Text>
+				<TextInput
+					style={styles.settingInput}
+					onChangeText={(text) => this.setState({familyName: text})}
+					value={this.state.familyName}
+				/>
 
 				{ /* company */ }
 				<Text style={styles.settingLabel}>COMPANY</Text>
-				<Text style={styles.settingText}>{contactData.company}</Text>
+				<TextInput
+					style={styles.settingInput}
+					onChangeText={(text) => this.setState({company: text})}
+					value={this.state.company}
+				/>
 
 				{ /* department */ }
 				<Text style={styles.settingLabel}>DEPARTMENT</Text>
-				<Text style={styles.settingText}>{contactData.department}</Text>
+				<TextInput
+					style={styles.settingInput}
+					onChangeText={(text) => this.setState({department: text})}
+					value={this.state.department}
+				/>
 
 				{ /* emailAddresses */ }
 				<Text style={styles.settingLabel}>EMAIL ADDRESSES</Text>
@@ -73,7 +115,8 @@ class ContactScreen extends Component {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		padding: 20,
+		paddingTop: 20,
+		paddingBottom: 20,
 		backgroundColor: '#FFFFFF',
 	},
 	heading: {
@@ -116,17 +159,3 @@ const styles = StyleSheet.create({
 		fontFamily: 'Poppins-Regular',
 	},
 });
-
-function mapDispatchToProps(dispatch) {
-	return bindActionCreators(ActionCreators, dispatch);
-}
-
-function mapStateToProps(state) {
-	return {
-		meetings: state.meetings,
-		isRunning: state.appState.isRunning,
-	};
-}
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(ContactScreen);

@@ -6,6 +6,8 @@ import { ActionCreators } from '../actions'
 
 var Contacts = require('react-native-contacts')
 
+import Spinner from 'react-native-loading-spinner-overlay';
+
 import {
 	Button,
 	Text,
@@ -17,56 +19,42 @@ import {
 } from 'react-native';
 
 
-class AddContactScreen extends Component {
+class WelcomeScreen extends Component {
 
 	constructor(props) {
 		super(props);
 
-		this.addContact = this.addContact.bind(this);
-		this.addContact = this.addContact.bind(this);
-
 		this.state = {
-			contacts: [],
-			id: this.props.navigation.state.params.id,
+			isLoading: true,
 		}
+
+		console.log('welcome');
 	}
 
-	static navigationOptions = {
-		title: 'Add contact'
+	navigationOptions = {
+	  header: null
 	};
-
-	addContact(contact) {
-			this.props.addContact({
-			id: this.state.id,
-			contact: contact
-		});
-	}
 
 	componentDidMount() {
 		Contacts.getAll((err, contacts) => {
 			if(err && err.type === 'permissionDenied'){
 
 			} else {
-				this.setState({
+				this.props.saveContactList({
 					contacts: contacts
 				});
+
+				this.setState({isLoading: false})
 			}
 		})
 	}
 
+
 	render() {
 		var self = this;
-		
-		var contactsList = this.state.contacts.map(function(contact, index) {
-						return <TouchableOpacity key={index} onPress={() => self.addContact(contact)} style={styles.settingTouch}>
-										<Text style={styles.settingTouchText}>{contact.givenName} {contact.familyName}</Text>
-									</TouchableOpacity>
-					});
 
 		return (
-			<ScrollView style={styles.container}>
-				{contactsList}
-			</ScrollView>
+			<Spinner visible={this.state.isLoading} textContent={"Loading contacts"} textStyle={{color: '#FFF'}} overlayColor='rgba(0, 0, 0, 0.75)'/>
 		);
 	}
 }
@@ -101,4 +89,4 @@ function mapStateToProps(state) {
 }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddContactScreen);
+export default connect(null, mapDispatchToProps)(WelcomeScreen);

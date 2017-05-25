@@ -6,6 +6,7 @@ import { ActionCreators } from '../actions'
 
 import Dates from 'react-native-dates';
 import moment from 'moment';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 import {
 	Button,
@@ -34,9 +35,9 @@ class SearchScreen extends Component {
 		}
 	}
 
-	static navigationOptions = {
-		title: 'Filter by date'
-	};
+  static navigationOptions = {
+		tabBarIcon: <Icon name="ios-calendar" size={28} color='#4F8EF7' />
+  };
 
 	setFilter() {
 		this.props.setDates({
@@ -67,6 +68,9 @@ class SearchScreen extends Component {
 
 		return (
 			<ScrollView style={styles.container}>
+				<Text style={styles.screenTitle}>
+					Search by date
+				</Text>
 				<Dates
 					onDatesChange={onDatesChange}
 					isDateBlocked={isDateBlocked}
@@ -99,6 +103,7 @@ class SearchScreen extends Component {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		padding: 20,
 		flexGrow: 1,
 		backgroundColor: '#FFFFFF',
 	},
@@ -110,12 +115,17 @@ const styles = StyleSheet.create({
 		color: 'blue'
 	},
 	button: {
-		margin: 10,
+		marginBottom: 10,
 	},
 	buttonLast: {
-		marginLeft: 10,
-		marginRight: 10,
 		marginBottom: 60,
+	},
+	screenTitle: {
+		fontSize: 21,
+		color: '#4F8EF7',
+		fontFamily: 'Poppins-Regular',
+		marginLeft: 4,
+		marginBottom: 16,
 	},
 });
 

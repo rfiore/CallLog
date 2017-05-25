@@ -14,9 +14,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.chirag.RNMail.*;
-import com.rnfs.RNFSPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
-import com.phonecallReceiver.PhonecallReceiverPackage;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
+import com.nerdyfactory.notification.NotificationPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import com.calendarevents.CalendarEventsPackage;
+import com.ocetnik.timer.BackgroundTimerPackage;
+
 
 
 public class MainApplication extends Application implements ReactApplication {
@@ -32,9 +36,12 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
           new RNMail(),
-          new RNFSPackage(),
           new ReactNativeContacts(),
-          new PhonecallReceiverPackage()
+          new ReactNativePushNotificationPackage(),
+          new NotificationPackage(),
+          new RNFetchBlobPackage() ,
+          new CalendarEventsPackage(),
+          new BackgroundTimerPackage()
       );
     }
   };

@@ -88,7 +88,7 @@ android {
 
     defaultConfig {
         applicationId "com.calllog"
-        minSdkVersion 16
+        minSdkVersion 18
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -131,7 +131,14 @@ dependencies {
     compile "com.facebook.react:react-native:+"  // From node_modules
     compile project(':RNMail')
     compile project(':react-native-contacts')
-    compile project(':react-native-fs')
+    compile project(':react-native-push-notification')
+    compile project(':things-notification')
+    compile project(':react-native-fetch-blob')
+    compile project(':react-native-calendar-events')
+    compile project(':react-native-background-timer')
+    compile ('com.google.android.gms:play-services-gcm:8.1.0') {
+        force = true;
+    }
 }
 
 // Run this once to be able to run the application with BUCK

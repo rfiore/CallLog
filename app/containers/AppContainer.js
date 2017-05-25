@@ -1,56 +1,52 @@
-import React, {
-	Component,
-	PropTypes
-} from 'react';
+import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { addNavigationHelpers, StackNavigator, TabNavigator } from 'react-navigation';
+import Notification from 'things-notification';
+import PushNotification from 'react-native-push-notification';
+import moment from 'moment';
+import Contacts from 'react-native-contacts';
+import Spinner from 'react-native-loading-spinner-overlay';
 import { bindActionCreators } from 'redux'
 import { ActionCreators } from '../actions'
 
-import {
-	addNavigationHelpers,
-	StackNavigator
-} from 'react-navigation';
+import TestScreen from '../components/Test';
+import CreateMeetingScreen from '../components/CreateMeeting';
+import MeetingScreen from '../components/Meeting';
+import SettingsScreen from '../components/Settings';
+
+import { searchContact } from '../utils/utils';
 
 
-import test from '../components/Test'
+class AppContainer extends React.Component {
 
-const AppNavigator = StackNavigator({
-	test1: { screen: test },
-	test2: { screen: test },
-});
-
-
-export const navReducer = (state, action) => {
-	const newState = AppNavigator.router.getStateForAction(action, state);
-	return newState || state;
-};
-
-
-class AppContainer extends Component {
-
-	render () {
-		const { dispatch, navigationState} = this.props
-
-		console.log(navigationState, this.props);
-
+	constructor(props) {
+		super(props);
+	}
+	
+	render() {
 		return (
-			<AppNavigator navigation={addNavigationHelpers({
-				dispatch: dispatch,
-				state: navigationState,
+			<AppNavigator screenProps={this.props.state} navigation={addNavigationHelpers({
+				dispatch: this.props.dispatch,
+				state: this.props.nav,
 			})} />
-		)
+		);
 	}
 }
 
-function mapDispatchToProps(dispatch) {
-	return Object.assign({dispatch: dispatch}, bindActionCreators(ActionCreators, dispatch));
-}
+AppWithNavigationState.propTypes = {
+	dispatch: PropTypes.func.isRequired,
+	nav: PropTypes.object.isRequired,
+};
+
+/*function mapDispatchToProps(dispatch) {
+	return bindActionCreators(ActionCreators, dispatch);
+}*/
 
 function mapStateToProps(state) {
 	return {
-		navigationState: state.nav,
+		state: state,
+		nav: state.nav,
 	};
 }
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(AppContainer);
+export default connect(mapStateToProps)(AppContainer);

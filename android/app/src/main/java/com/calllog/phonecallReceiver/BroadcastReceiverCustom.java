@@ -1,24 +1,50 @@
-package com.phonecallReceiver;
-
-import java.util.Date;
+package com.calllog;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.telephony.TelephonyManager;
 
-public abstract class PhonecallReceiver extends BroadcastReceiver {
 
-	//The receiver will be recreated whenever android feels like it.  We need a static variable to remember data between instantiations
+import android.widget.Toast;
 
+import java.util.Date;
+
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.Callback;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.Arguments;
+
+import android.util.Log;
+
+import com.phonecallReceiver.PhonecallReceiverModule;
+
+public class BroadcastReceiverCustom extends BroadcastReceiver {
+	
 	private static int lastState = TelephonyManager.CALL_STATE_IDLE;
 	private static Date callStartTime;
 	private static boolean isIncoming;
 	private static String savedNumber;  //because the passed incoming is only valid in ringing
 
+	ReactApplicationContext reactContext;
+
+	PhonecallReceiverModule phonecallReceiverModule;
+
+	public BroadcastReceiverCustom(){
+		phonecallReceiverModule = new PhonecallReceiverModule(reactContext);
+	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+
+		WritableMap params = Arguments.createMap();
+    params.putString("testParam", "yo");
+
+		phonecallReceiverModule.sendEvent("notificationReceived", params);
 
 		//We listen to two intents.  The new outgoing call only tells us of an outgoing call.  We use it to get the number.
 		if (intent.getAction().equals("android.intent.action.NEW_OUTGOING_CALL")) {
@@ -44,11 +70,25 @@ public abstract class PhonecallReceiver extends BroadcastReceiver {
 	}
 
 	//Derived classes should override these to respond to specific events of interest
-	protected void onIncomingCallStarted(Context ctx, String number, Date start){}
-	protected void onOutgoingCallStarted(Context ctx, String number, Date start){}
-	protected void onIncomingCallEnded(Context ctx, String number, Date start, Date end){}
-	protected void onOutgoingCallEnded(Context ctx, String number, Date start, Date end){}
-	protected void onMissedCall(Context ctx, String number, Date start){}
+	protected void onIncomingCallStarted(Context ctx, String number, Date start){
+		Toast.makeText(ctx,"Incoming Call Started", Toast.LENGTH_LONG).show();
+	}
+
+	protected void onOutgoingCallStarted(Context ctx, String number, Date start){
+		Toast.makeText(ctx,"Outgoing Call Started", Toast.LENGTH_LONG).show();
+	}
+
+	protected void onIncomingCallEnded(Context ctx, String number, Date start, Date end){
+		Toast.makeText(ctx,"Incoming Call Ended", Toast.LENGTH_LONG).show();
+	}
+
+	protected void onOutgoingCallEnded(Context ctx, String number, Date start, Date end){
+		Toast.makeText(ctx,"Out going CallEnded", Toast.LENGTH_LONG).show();
+	}
+
+	protected void onMissedCall(Context ctx, String number, Date start){
+		Toast.makeText(ctx,"Missed Call", Toast.LENGTH_LONG).show();
+	}
 
 	//Deals with actual events
 
